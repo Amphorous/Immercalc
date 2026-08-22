@@ -37,14 +37,17 @@ spring:
     ansi:
       enabled: ALWAYS
 
-  # Without this, Jackson's JSR-310 module serializes LocalDate as a
-  # [yyyy,mm,dd] array instead of an ISO string - it follows the same
-  # write-dates-as-timestamps flag as Instant/Date, and that flag defaults to
-  # true. The pull-calc endpoints return LocalDate fields, so this needs to
-  # be off for the frontend to get plain "2026-08-23" strings.
+  # Without this, Jackson serializes LocalDate as a [yyyy,mm,dd] array instead
+  # of an ISO string. On Boot 4 (Jackson 3/"tools.jackson"), this flag lives
+  # on the datatype.datetime map (DateTimeFeature), not on the plain
+  # serialization map (SerializationFeature) like it did on Jackson 2 - that
+  # older path fails to bind here with a "no enum constant" error. The
+  # pull-calc endpoints return LocalDate fields, so this needs to be off for
+  # the frontend to get plain "2026-08-23" strings.
   jackson:
-    serialization:
-      write-dates-as-timestamps: false
+    datatype:
+      datetime:
+        write-dates-as-timestamps: false
 
 server:
   port: 8083
