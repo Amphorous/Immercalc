@@ -1,0 +1,73 @@
+application:
+  title: immercalc
+  version: 1.0.0
+
+spring:
+  application:
+    name: immercalc
+
+  # Shared game-data stores also used by Celestia (same orexis hosts/DB names) -
+  # a relic optimizer needs the same character/relic-set metadata Celestia
+  # already maintains, rather than keeping a second copy.
+  #
+  # Connection settings live under spring.mongodb.* rather than
+  # spring.data.mongodb.* - on Boot 4 the data-prefixed host/port/database
+  # keys are deprecated (error level) in favor of spring.mongodb.*.
+  # auto-index-creation has no such replacement, so it stays put.
+  mongodb:
+    host: ${SPRING_DATA_MONGODB_HOST:mongo-orexis}
+    port: 27017
+    database: hsrdbmongo
+  data:
+    mongodb:
+      auto-index-creation: true
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis-orexis}
+      port: 6379
+    neo4j:
+      database: neo4j
+
+  neo4j:
+    uri: ${SPRING_DATA_NEO4J_URI:bolt://neo4j-orexis:7687}
+    authentication:
+      username: ${SPRING_DATA_NEO4J_AUTHENTICATION_USERNAME:neo4j}
+      password: ${SPRING_DATA_NEO4J_AUTHENTICATION_PASSWORD:frozenapp12}
+
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  # Without this, Jackson's JSR-310 module serializes LocalDate as a
+  # [yyyy,mm,dd] array instead of an ISO string - it follows the same
+  # write-dates-as-timestamps flag as Instant/Date, and that flag defaults to
+  # true. The pull-calc endpoints return LocalDate fields, so this needs to
+  # be off for the frontend to get plain "2026-08-23" strings.
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8083
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.hostname}:${server.port}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,logfile,metrics
+  endpoint:
+    logfile:
+      enabled: true
+
+logging:
+  file:
+    name: /app/logs/${spring.application.name}.log

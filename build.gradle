@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'org.hoyo'
+version = '0.0.1-SNAPSHOT'
+description = 'Immercalc'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2025.1.1")
+}
+
+dependencies {
+    // --- Core Spring Boot dependencies ---
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'  // MongoDB integration
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'    // Neo4j database support
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-web'           // REST API + web server
+
+    // --- Code generation and boilerplate reduction ---
+    compileOnly 'org.projectlombok:lombok'             // Lombok for getters/setters
+    annotationProcessor 'org.projectlombok:lombok'     // Annotation processing for Lombok
+
+    // --- Testing ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'  // Spring Boot test utilities
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'            // JUnit platform launcher
+
+    // --- API Documentation and Monitoring ---
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6' // Auto-generates Swagger UI
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // Health, metrics, etc.
+
+    // --- Feign Client (for REST communication between services) ---
+    implementation ("io.github.openfeign:feign-core:11.9")
+    implementation ("io.github.openfeign:feign-jackson:11.9")
+
+    // --- Eureka Netflix Client ---
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

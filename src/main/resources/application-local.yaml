@@ -1,0 +1,8 @@
+spring:
+  neo4j:
+    uri: bolt://philia.home:7687
+  mongodb:
+    host: philia.home
+  data:
+    redis:
+      host: philia.home
