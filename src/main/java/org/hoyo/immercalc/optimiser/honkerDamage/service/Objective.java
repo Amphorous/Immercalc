@@ -15,8 +15,7 @@ public class Objective {
     private final Map<String, CharacterDmgCalculator> calculatorsByAvatarId;
 
     public Objective(List<CharacterDmgCalculator> calculators) {
-        this.calculatorsByAvatarId = calculators.stream()
-                .collect(Collectors.toMap(CharacterDmgCalculator::getAvatarId, Function.identity()));
+        this.calculatorsByAvatarId = calculators.stream().collect(Collectors.toMap(CharacterDmgCalculator::getAvatarId, Function.identity()));
     }
 
     // Every avatarId with a real CharacterDmgCalculator bean - this is what

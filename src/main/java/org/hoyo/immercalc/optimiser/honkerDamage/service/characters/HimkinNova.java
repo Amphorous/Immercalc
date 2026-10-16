@@ -6,6 +6,7 @@ import org.hoyo.immercalc.optimiser.honkerDamage.model.Team;
 import org.hoyo.immercalc.optimiser.honkerDamage.model.TeamMemberDTO;
 import org.hoyo.immercalc.optimiser.honkerDamage.model.TurnRecord;
 import org.hoyo.immercalc.optimiser.honkerDamage.debug.RotationRunResult;
+import org.hoyo.immercalc.optimiser.honkerDamage.model.characterActionModels.HimkinNova.FastPremiumVerdictV0.Greg;
 import org.hoyo.immercalc.optimiser.honkerDamage.service.ActionDecisionMaker;
 import org.hoyo.immercalc.optimiser.honkerDamage.service.CharacterDmgCalculator;
 import org.hoyo.immercalc.optimiser.honkerDamage.service.RotationBuilder;
@@ -22,10 +23,12 @@ public class HimkinNova implements CharacterDmgCalculator, ActionDecisionMaker {
 
     private final RotationBuilder rotationBuilder;
     private final SimulationEngine simulationEngine;
+    private final Greg greg;
 
-    public HimkinNova(RotationBuilder rotationBuilder, SimulationEngine simulationEngine) {
+    public HimkinNova(RotationBuilder rotationBuilder, SimulationEngine simulationEngine, Greg greg) {
         this.rotationBuilder = rotationBuilder;
         this.simulationEngine = simulationEngine;
+        this.greg = greg;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class HimkinNova implements CharacterDmgCalculator, ActionDecisionMaker {
     }
 
     @Override
-    public List<TurnRecord> actionDecision(RotationMember turnOwner, Team team, int turnNumber) {
+    public List<TurnRecord> actionDecision(PriorityQueue<RotationMember> rotationQueue, RotationMember turnOwner, Team team, int turnNumber) {
         switch (turnOwner.getAvatarId()) {
             case AVATAR_ID -> {
                 // himkin
@@ -60,6 +63,20 @@ public class HimkinNova implements CharacterDmgCalculator, ActionDecisionMaker {
             }
             case "1414" -> {
                 // greg
+                if(turnOwner.getCurrentEnergy() == turnOwner.getMaxEnergy()){
+                    greg.ult(turnOwner, team, turnNumber);
+                }
+                if(team.getSkillPoints() > 3){
+                    greg.skill(turnOwner, rotationQueue, team, AVATAR_ID, turnNumber); // TODO add this to the turn order list
+                } else {
+                    greg.basic(turnOwner, team, turnNumber);
+                }
+                if(turnOwner.getCurrentEnergy() == turnOwner.getMaxEnergy()){
+                    greg.ult(turnOwner, team, turnNumber);
+                }
+            }
+            case "soulDragon" -> {
+                // check for
             }
         }
         return List.of();
@@ -78,8 +95,8 @@ public class HimkinNova implements CharacterDmgCalculator, ActionDecisionMaker {
                 buff.setBuffValue(0.4);
                 buff.setBuffLifetime(1);
                 buff.setCountsDownAtTurnEnd(false);
-                buff.setBuffOwner("1004");
-                buff.setRecipientId("1004");
+                buff.setBuffOwnerAvatarId("1004");
+                buff.setBuffRecipientAvatarId("1004");
                 buff.setConsumeOnApplication(true);
                 buff.setUsesLeft(1);
                 initialBuffs.add(buff);
@@ -91,8 +108,8 @@ public class HimkinNova implements CharacterDmgCalculator, ActionDecisionMaker {
                 buff.setBuffValue(0.4);
                 buff.setBuffLifetime(1);
                 buff.setCountsDownAtTurnEnd(false);
-                buff.setBuffOwner("1414");
-                buff.setRecipientId("1414");
+                buff.setBuffOwnerAvatarId("1414");
+                buff.setBuffRecipientAvatarId("1414");
                 buff.setConsumeOnApplication(true);
                 buff.setUsesLeft(1);
                 initialBuffs.add(buff);

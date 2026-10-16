@@ -28,10 +28,10 @@ public class RotationDebugFormatter {
 
         sb.append("\n=== BUFFS PROVIDED ===\n");
         for (BuffInstance buff : initialBuffs) {
-            String recipient = BuffInstance.TEAM_RECIPIENT_ID.equals(buff.getRecipientId()) ? "TEAM" : buff.getRecipientId();
+            String recipient = BuffInstance.TEAM_RECIPIENT_ID.equals(buff.getBuffRecipientAvatarId()) ? "TEAM" : buff.getBuffRecipientAvatarId();
             sb.append(String.format(
                     "owner=%-8s recipient=%-8s key=%-16s value=%-8.4f lifetime=%-4s countsDownAtTurnEnd=%-6s (%s)%n",
-                    buff.getBuffOwner(), recipient, buff.getBuffKey(), buff.getBuffValue(),
+                    buff.getBuffOwnerAvatarId(), recipient, buff.getBuffKey(), buff.getBuffValue(),
                     buff.getBuffLifetime(), buff.getCountsDownAtTurnEnd(), buff.getBuffName()
             ));
         }
@@ -58,10 +58,10 @@ public class RotationDebugFormatter {
 
         sb.append("=== INITIAL BUFFS ===\n");
         for (BuffInstance buff : initialBuffs) {
-            String recipient = BuffInstance.TEAM_RECIPIENT_ID.equals(buff.getRecipientId()) ? "TEAM" : buff.getRecipientId();
+            String recipient = BuffInstance.TEAM_RECIPIENT_ID.equals(buff.getBuffRecipientAvatarId()) ? "TEAM" : buff.getBuffRecipientAvatarId();
             sb.append(String.format(
                     "owner=%-8s recipient=%-8s key=%-16s value=%-8.4f lifetime=%-4s countsDownAtTurnEnd=%-6s (%s)%n",
-                    buff.getBuffOwner(), recipient, buff.getBuffKey(), buff.getBuffValue(),
+                    buff.getBuffOwnerAvatarId(), recipient, buff.getBuffKey(), buff.getBuffValue(),
                     buff.getBuffLifetime(), buff.getCountsDownAtTurnEnd(), buff.getBuffName()
             ));
         }

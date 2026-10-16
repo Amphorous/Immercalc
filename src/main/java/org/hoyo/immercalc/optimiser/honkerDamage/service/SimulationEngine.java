@@ -1,10 +1,6 @@
 package org.hoyo.immercalc.optimiser.honkerDamage.service;
 
-import org.hoyo.immercalc.optimiser.honkerDamage.model.BuffInstance;
-import org.hoyo.immercalc.optimiser.honkerDamage.model.RotationMember;
-import org.hoyo.immercalc.optimiser.honkerDamage.model.Team;
-import org.hoyo.immercalc.optimiser.honkerDamage.model.TeamMemberDTO;
-import org.hoyo.immercalc.optimiser.honkerDamage.model.TurnRecord;
+import org.hoyo.immercalc.optimiser.honkerDamage.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,11 +43,12 @@ public class SimulationEngine {
                 cycle.setCycleNumber(cycle.getCycleNumber() + 1);
             } else {
                 rotationBuilder.turnStartBuffStep(team.getTeamMembers(), turnOwner.getAvatarId());
-                List<TurnRecord> actionRecords = actionDecisionMaker.actionDecision(turnOwner, team, turnNumber);
+                List<TurnRecord> actionRecords = actionDecisionMaker.actionDecision(rotationQueue, turnOwner, team, turnNumber);
                 rotationBuilder.turnEndBuffStep(team.getTeamMembers(), turnOwner.getAvatarId());
 
                 turnRecords.addAll(actionRecords);
             }
+            // TODO before turn order recalc, try using all ults
             rotationBuilder.recalculateTurnOrder(team.getTeamMembers(), rotationQueue, cycle, turnOwner.getAvatarId(), consumedAV);
             turnNumber++;
         }

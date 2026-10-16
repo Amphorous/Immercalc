@@ -1,7 +1,6 @@
 package org.hoyo.immercalc.optimiser.honkerDamage.model;
 
 import lombok.Data;
-import lombok.Generated;
 
 @Data
 public class BuffInstance {
@@ -12,14 +11,14 @@ public class BuffInstance {
     public static final String TEAM_RECIPIENT_ID = "TEAM";
     private String buffId; // turn_no+"-"+buffInstances.size() (index this buff occupies once added)
 
-    private String buffName; // Buff's origin name i.e, Divine Provision from HuoHuo
+    private String buffName; // Buff's origin name ex, Divine Provision from HuoHuo
     private String buffKey; // which stat gets buffed
     private Double buffValue;
     private Integer buffLifetime; // if '-1' then buff lasts forever
     private Boolean countsDownAtTurnEnd;
 
-    private String buffOwner; // maintain a new HashMap<String avatarId, List<BuffInstance>>
-    private String recipientId; // avatarId of the receiver, or TEAM_RECIPIENT_ID
+    private String buffOwnerAvatarId; // maintain a new HashMap<String avatarId, List<BuffInstance>>
+    private String buffRecipientAvatarId; // avatarId of the receiver, or TEAM_RECIPIENT_ID
 
     // for buffs like action advance which tick down after each use
     private Boolean consumeOnApplication = false;
@@ -36,8 +35,8 @@ public class BuffInstance {
         copy.setBuffValue(buffValue);
         copy.setBuffLifetime(buffLifetime);
         copy.setCountsDownAtTurnEnd(countsDownAtTurnEnd);
-        copy.setBuffOwner(buffOwner);
-        copy.setRecipientId(recipientId);
+        copy.setBuffOwnerAvatarId(buffOwnerAvatarId);
+        copy.setBuffRecipientAvatarId(buffRecipientAvatarId);
         copy.setConsumeOnApplication(consumeOnApplication);
         copy.setUsesLeft(usesLeft);
         return copy;

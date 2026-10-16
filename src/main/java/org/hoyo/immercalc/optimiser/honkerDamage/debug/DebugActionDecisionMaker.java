@@ -9,6 +9,7 @@ import org.hoyo.immercalc.optimiser.honkerDamage.service.RotationBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.PriorityQueue;
 
 // Debug-only ActionDecisionMaker - every character does nothing on their turn
 // except Sunday (1313), whose turn triggers a scripted 100% ActionAdvance on
@@ -25,7 +26,7 @@ public class DebugActionDecisionMaker implements ActionDecisionMaker {
     }
 
     @Override
-    public List<TurnRecord> actionDecision(RotationMember turnOwner, Team team, int turnNumber) {
+    public List<TurnRecord> actionDecision(PriorityQueue<RotationMember> rotationQueue, RotationMember turnOwner, Team team, int turnNumber) {
         if ("1313".equals(turnOwner.getAvatarId())) {
             BuffInstance buff = new BuffInstance();
             buff.setBuffName("Debug: Sunday's turn advances Himkin");
@@ -33,8 +34,8 @@ public class DebugActionDecisionMaker implements ActionDecisionMaker {
             buff.setBuffValue(1.0);
             buff.setBuffLifetime(1);
             buff.setCountsDownAtTurnEnd(false);
-            buff.setBuffOwner("1510");
-            buff.setRecipientId("1510");
+            buff.setBuffOwnerAvatarId("1510");
+            buff.setBuffRecipientAvatarId("1510");
             buff.setConsumeOnApplication(true);
             buff.setUsesLeft(1);
             rotationBuilder.applyIndividualBuff(team, buff, turnNumber);

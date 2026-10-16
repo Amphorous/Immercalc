@@ -21,8 +21,8 @@ public class RotationBuilder {
      * @param buffInstance
      */
     public void applyIndividualBuff(Team team, BuffInstance buffInstance, int turnNumber) {
-        buffInstance.setBuffId(turnNumber + "-" + team.getMember(buffInstance.getRecipientId()).getBuffInstances().toArray().length);
-        team.getMember(buffInstance.getRecipientId()).getBuffInstances().add(buffInstance);
+        buffInstance.setBuffId(turnNumber + "-" + team.getMember(buffInstance.getBuffRecipientAvatarId()).getBuffInstances().toArray().length);
+        team.getMember(buffInstance.getBuffRecipientAvatarId()).getBuffInstances().add(buffInstance);
     }
 
     /**
@@ -30,13 +30,31 @@ public class RotationBuilder {
      * @param team
      * @param buffInstance
      */
-    private void applyTeamBuff(Team team, BuffInstance buffInstance, int turnNumber) {
+    public void applyTeamBuff(Team team, BuffInstance buffInstance, int turnNumber) {
         for (RotationMember member : team.getTeamMembers()) {
-            if (!member.getIsCycleIndicator()) {
+            if (!member.getIsCycleIndicator() && member.isAllowTeamBuffs()) {
                 buffInstance.setBuffId(turnNumber + "-" + member.getBuffInstances().toArray().length);
                 member.getBuffInstances().add(buffInstance);
             }
         }
+    }
+
+    /**
+     * Can remove a buff from any unit that has it and then applies a refreshed buff to the recipient. If the recipient is already the current owner,
+     * the buff is essentially refreshed.
+     * @param team
+     * @param buffInstance
+     * @param turnNumber
+     */
+    public void transferBuff(Team team, BuffInstance buffInstance, int turnNumber) {
+        for (RotationMember member : team.getTeamMembers()) {
+            for(BuffInstance buff : member.getBuffInstances()) {
+                if (buffInstance.getBuffName().equals(buff.getBuffName()) && isBuffActive(buff)) {
+                    buff.setBuffLifetime(0);
+                }
+            }
+        }
+        applyIndividualBuff(team, buffInstance, turnNumber);
     }
 
     /**
@@ -59,7 +77,7 @@ public class RotationBuilder {
 
         // teamBuff.setRecipientId(BuffInstance.TEAM_RECIPIENT_ID); TODO thats how you teamBuff
         for (BuffInstance buffInstance : initialBuffs) { // TODO be careful with buffInstance objs, we need to pass them as references
-            if (BuffInstance.TEAM_RECIPIENT_ID.equals(buffInstance.getRecipientId())) applyTeamBuff(team, buffInstance, 0);
+            if (BuffInstance.TEAM_RECIPIENT_ID.equals(buffInstance.getBuffRecipientAvatarId())) applyTeamBuff(team, buffInstance, 0);
             else applyIndividualBuff(team, buffInstance, 0);
         }
         // evaluate each units speed using buffs first, then get action value, then populate the rotationOrder Queue
@@ -143,7 +161,7 @@ public class RotationBuilder {
     private void initialActionValue(RotationMember member, Double effectiveSpeed) {
         // since this is init, AG is 10000 (default), no complex AV <-> AG linking logic here (this will be impl in specific dmg calc classes)
         Double actionGauge = member.getActionGauge();
-        Double actionValue = member.getActionValue();
+        Double actionValue;
         Double actionAdvance = 0.0; // these values are %, so usually below 1, above 0
         Double actionDelay = 0.0;
 
@@ -182,7 +200,7 @@ public class RotationBuilder {
         for (RotationMember member : members) {
             List<BuffInstance> buffInstances = member.getBuffInstances();
             for (BuffInstance buffInstance : buffInstances) {
-                if(buffInstance.getBuffOwner().equals(turnOwnerAvatarId) && !buffInstance.getCountsDownAtTurnEnd() && (buffInstance.getBuffLifetime() > 0)) {
+                if(buffInstance.getBuffOwnerAvatarId().equals(turnOwnerAvatarId) && !buffInstance.getCountsDownAtTurnEnd() && (buffInstance.getBuffLifetime() > 0)) {
                     // this buff ticks down now (if buff timer depends on current turn owner, the buff ticks at turn start, and the buff isnt already expired)
                     buffInstance.setBuffLifetime(buffInstance.getBuffLifetime() - 1);
                 }
@@ -194,7 +212,7 @@ public class RotationBuilder {
         for (RotationMember member : members) {
             List<BuffInstance> buffInstances = member.getBuffInstances();
             for (BuffInstance buffInstance : buffInstances) {
-                if(buffInstance.getBuffOwner().equals(turnOwnerAvatarId) && buffInstance.getCountsDownAtTurnEnd()  && (buffInstance.getBuffLifetime() > 0)) {
+                if(buffInstance.getBuffOwnerAvatarId().equals(turnOwnerAvatarId) && buffInstance.getCountsDownAtTurnEnd()  && (buffInstance.getBuffLifetime() > 0)) {
                     // this buff ticks down now (if buff timer depends on current turn owner, the buff ticks at turn end, and the buff isnt already expired)
                     buffInstance.setBuffLifetime(buffInstance.getBuffLifetime() - 1);
                 }
@@ -203,6 +221,16 @@ public class RotationBuilder {
     }
     
 
+    public void createSummon(PriorityQueue<RotationMember> rotationQueue, Team team, RotationMember summon) {
+        initialActionValue(summon, calculateSpeed(summon));
+        rotationQueue.offer(summon);
+        team.getTeamMembers().add(summon);
+    };
+
+    public boolean removeSummon(PriorityQueue<RotationMember> rotationQueue, Team team, String avatarId) {
+        team.getTeamMembers().removeIf(member -> member.getAvatarId().equals(avatarId));
+        return rotationQueue.removeIf(member -> member.getAvatarId().equals(avatarId));
+    }
 
     /**
      * Inputs contain rotation members with their buffs appropriately stepped, no change in AG/AV

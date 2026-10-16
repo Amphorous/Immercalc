@@ -47,8 +47,8 @@ public class HimkinDummyDataFactory {
             buff.setBuffValue(0.1 + RANDOM.nextDouble() * 0.2); // 0.10-0.30
             buff.setBuffLifetime(1);
             buff.setCountsDownAtTurnEnd(true);
-            buff.setBuffOwner(avatarId);
-            buff.setRecipientId(avatarId);
+            buff.setBuffOwnerAvatarId(avatarId);
+            buff.setBuffRecipientAvatarId(avatarId);
             buffs.add(buff);
         }
 
@@ -59,8 +59,8 @@ public class HimkinDummyDataFactory {
         teamBuff.setBuffValue(0.1);
         teamBuff.setBuffLifetime(2);
         teamBuff.setCountsDownAtTurnEnd(false);
-        teamBuff.setBuffOwner(HIMKIN_AVATAR_ID);
-        teamBuff.setRecipientId(BuffInstance.TEAM_RECIPIENT_ID);
+        teamBuff.setBuffOwnerAvatarId(HIMKIN_AVATAR_ID);
+        teamBuff.setBuffRecipientAvatarId(BuffInstance.TEAM_RECIPIENT_ID);
         buffs.add(teamBuff);
 
         // One decorative buff RotationBuilder doesn't react to - proves
@@ -72,8 +72,8 @@ public class HimkinDummyDataFactory {
         decorative.setBuffValue(0.05);
         decorative.setBuffLifetime(3);
         decorative.setCountsDownAtTurnEnd(false);
-        decorative.setBuffOwner(decoratedAvatarId);
-        decorative.setRecipientId(decoratedAvatarId);
+        decorative.setBuffOwnerAvatarId(decoratedAvatarId);
+        decorative.setBuffRecipientAvatarId(decoratedAvatarId);
         buffs.add(decorative);
 
         return buffs;

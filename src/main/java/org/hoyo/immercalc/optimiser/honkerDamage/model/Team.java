@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Data
@@ -14,7 +15,8 @@ public class Team {
     // List instead of the old LinkedHashMap<String, RotationMember>, since
     // each RotationMember now carries its own avatarId - there's nothing
     // left for an external map key to add.
-    private List<RotationMember> teamMembers;
+    private List<RotationMember> teamMembers; // includes team and summons
+    // private HashSet<String> activeSummons; // set of active summons, (this might be useful at some point)
     private int skillPoints;
 
     public RotationMember getMember(String avatarId) {
